@@ -1,4 +1,4 @@
-name: Snyk Code Security Scan
+name: Snyk SCA Security Scan
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   security-analysis:
-    name: 🛡️ Snyk Code Security Analysis
+    name: 🛡️ Snyk SCA Security Analysis
     runs-on: ubuntu-latest
     env:
       ###############################################################
@@ -23,9 +23,9 @@ jobs:
       ###############################################################
       # Set to true to fail the pipeline on high/critical severity issues (default: false)
       # By default, the scan continues even if issues are found (exit code 0)
-      # To fail on high/critical issues, set SNYK_CODE_FAIL_ON_ISSUES: true above
+      # To fail on high/critical issues, set SNYK_SCA_FAIL_ON_ISSUES: true above
       ###############################################################
-      SNYK_CODE_FAIL_ON_ISSUES: false
+      SNYK_SCA_FAIL_ON_ISSUES: false
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -38,24 +38,27 @@ jobs:
         with:
           node-version: '20'
 
-      - name: 🛡️ Snyk Code test (with timing)
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🛡️ Snyk SCA test (with timing)
         run: |
-          echo "⏱️ Starting Snyk Code scan..."
+          echo "⏱️ Starting Snyk SCA scan..."
           start_time=$(date +%s)
           
-          # Run Snyk Code test
-          if [[ "${{ env.SNYK_CODE_FAIL_ON_ISSUES }}" == "true" ]]; then
+          # Run Snyk SCA test
+          if [[ "${{ env.SNYK_SCA_FAIL_ON_ISSUES }}" == "true" ]]; then
             echo "❗ Pipeline will fail if high/critical issues are found"
-            snyk code test --severity-threshold=high && SCAN_RESULT=0 || SCAN_RESULT=$?
+            snyk test --severity-threshold=high && SCAN_RESULT=0 || SCAN_RESULT=$?
           else
             echo "ℹ️ Pipeline will continue regardless of issues found (reporting only)"
-            snyk code test || true
+            snyk test || true
             SCAN_RESULT=0
           fi
           
           end_time=$(date +%s)
           duration=$((end_time - start_time))
-          echo "🔥 SNYK CODE SCAN COMPLETED IN: $duration SECONDS 🔥"
+          echo "🔥 SNYK SCA SCAN COMPLETED IN: $duration SECONDS 🔥"
           
           # If scan failed due to vulnerabilities, provide clear message
           if [[ $SCAN_RESULT -ne 0 ]]; then
@@ -79,9 +82,9 @@ jobs:
         run: |
           echo "📊 Generating HTML report..."
           TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
-          REPORT_NAME="${{ github.event.repository.name }}-snyk-code-report-${TIMESTAMP}.html"
-          snyk code test --json > snyk-code.json || true
-          npx snyk-to-html -i snyk-code.json -o "${REPORT_NAME}"
+          REPORT_NAME="${{ github.event.repository.name }}-snyk-sca-report-${TIMESTAMP}.html"
+          snyk test --json > snyk-sca.json || true
+          npx snyk-to-html -i snyk-sca.json -o "${REPORT_NAME}"
           echo "✅ HTML report generated: ${REPORT_NAME}"
           echo "REPORT_NAME=${REPORT_NAME}" >> $GITHUB_ENV
         env:
@@ -91,7 +94,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.repository.name }}-snyk-code-report
+          name: ${{ github.event.repository.name }}-snyk-sca-report
           path: ${{ env.REPORT_NAME }}
 
       - name: 📥 Download Report Instructions
@@ -103,13 +106,13 @@ jobs:
           echo ""
           echo "1. Scroll down to the bottom of this page"
           echo "2. Find 'Artifacts' section"  
-          echo "3. Click on: ${{ github.event.repository.name }}-snyk-code-report"
+          echo "3. Click on: ${{ github.event.repository.name }}-snyk-sca-report"
           echo "4. Extract the ZIP file to view the HTML report"
           echo ""
           echo "Direct link to this run:"
           echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           echo ""
-          if [[ "${{ env.SNYK_CODE_FAIL_ON_ISSUES }}" == "true" ]]; then
+          if [[ "${{ env.SNYK_SCA_FAIL_ON_ISSUES }}" == "true" ]]; then
             echo "🛡️ Security gate: ENABLED (blocking high/critical issues)"
           else
             echo "📊 Security gate: DISABLED (reporting only, not blocking)"

@@ -1,18 +1,24 @@
 {
-  "name": "snyk-code-github-actions-demo",
+  "name": "snyk-sca-github-actions-demo",
   "version": "1.0.0",
-  "description": "Demo project for Snyk Code scanning with GitHub Actions",
+  "description": "Demo project for Snyk SCA scanning with GitHub Actions",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
-  "keywords": ["snyk", "security", "github-actions"],
+  "keywords": ["snyk", "security", "github-actions", "sca", "vulnerability-scanning"],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "express": "4.17.1",
     "lodash": "4.17.19",
-    "axios": "0.21.0"
+    "axios": "0.21.0",
+    "minimist": "1.2.0",
+    "tar": "4.4.13",
+    "js-yaml": "3.13.1",
+    "handlebars": "4.7.6",
+    "marked": "1.2.9"
   },
   "devDependencies": {
     "snyk-to-html": "^2.3.2"
