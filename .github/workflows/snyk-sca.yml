@@ -77,6 +77,15 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+      - name: 📤 Send results to Snyk Web UI
+        if: always()
+        run: |
+          echo "📤 Uploading snapshot to Snyk Web UI..."
+          snyk monitor --project-name="${{ github.repository }}" --target-reference="${{ github.ref_name }}" || true
+          echo "✅ Results available in Snyk Web UI: https://app.snyk.io"
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
       - name: 📊 Generate HTML Report
         if: always()
         run: |
