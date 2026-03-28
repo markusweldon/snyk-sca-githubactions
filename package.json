@@ -11,13 +11,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "4.17.1",
+    "express": "4.22.0",
     "lodash": "4.17.19",
     "axios": "0.21.0",
     "minimist": "1.2.0",
     "tar": "4.4.13",
     "js-yaml": "3.13.1",
-    "handlebars": "4.7.6",
+    "handlebars": "4.7.9",
     "marked": "1.2.9"
   },
   "devDependencies": {
